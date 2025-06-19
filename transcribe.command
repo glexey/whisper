@@ -46,7 +46,7 @@ while true; do
     fi
 
     #whisper --language=ru --output_format=txt --model=large --fp16=False "$media_file"
-    $whisper/build/bin/whisper-cli -m $whisper/models/ggml-large-v3.bin -f "$whisper_input" -l auto -otxt
+    $whisper/build/bin/whisper-cli -m $whisper/models/ggml-large-v3.bin -f "$whisper_input" -l auto -otxt -of "$base_name"
     
     if [ $? -ne 0 ] || [ ! -f "$expected_txt" ]; then
         echo "Error processing file: $media_file"
