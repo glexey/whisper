@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 import argparse
+import shlex
 from pathlib import Path
 
 MEDIA_EXTENSIONS = {'.mp3', '.mp4', '.wav', '.m4a', '.avi', '.mov'}
@@ -26,6 +27,7 @@ def preprocess_audio(src: Path) -> Path:
         '-af', 'silenceremove=stop_periods=-1:stop_duration=1:stop_threshold=-30dB',
         processed_wav
     ]
+    print(f"Running: {' '.join(shlex.quote(str(arg)) for arg in cmd)}")
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if result.returncode != 0:
         print(f"ffmpeg error while processing {src.name}", file=sys.stderr)
@@ -45,12 +47,13 @@ def transcribe_with_whisper(input_file: Path, output_base: Path, model: str):
         '-et', '2.8',
         '--prompt', "Please transcribe with proper punctuation and capitalization."
     ]
+    print(f"Running: {' '.join(shlex.quote(str(arg)) for arg in cmd)}")
     return subprocess.run(cmd).returncode == 0
 
 def main():
     parser = argparse.ArgumentParser(description='Transcribe media files using Whisper')
-    parser.add_argument('--model', '-m', default='large-v3', 
-                       help='Whisper model to use (default: large-v3)')
+    parser.add_argument('--model', '-m', default='medium', 
+                       help='Whisper model to use (default: medium)')
     args = parser.parse_args()
 
     os.chdir(Path(__file__).resolve().parent)
