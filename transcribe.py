@@ -3,12 +3,12 @@
 import os
 import subprocess
 import sys
+import argparse
 from pathlib import Path
 
 MEDIA_EXTENSIONS = {'.mp3', '.mp4', '.wav', '.m4a', '.avi', '.mov'}
 WHISPER_PATH = Path('/Users/alexey/projects/whisper.cpp')
 WHISPER_BIN = WHISPER_PATH / 'build/bin/whisper-cli'
-WHISPER_MODEL = WHISPER_PATH / 'models/ggml-large-v3.bin'
 
 def find_media_file(directory: Path) -> Path | None:
     for file in directory.iterdir():
@@ -33,10 +33,11 @@ def preprocess_audio(src: Path) -> Path:
     print(f"Generated: {processed_wav.name}")
     return processed_wav
 
-def transcribe_with_whisper(input_file: Path, output_base: Path):
+def transcribe_with_whisper(input_file: Path, output_base: Path, model: str):
+    whisper_model = WHISPER_PATH / f'models/ggml-{model}.bin'
     cmd = [
         WHISPER_BIN,
-        '-m', WHISPER_MODEL,
+        '-m', whisper_model,
         '-f', input_file,
         '-l', 'auto',
         '-otxt',
@@ -47,6 +48,11 @@ def transcribe_with_whisper(input_file: Path, output_base: Path):
     return subprocess.run(cmd).returncode == 0
 
 def main():
+    parser = argparse.ArgumentParser(description='Transcribe media files using Whisper')
+    parser.add_argument('--model', '-m', default='large-v3', 
+                       help='Whisper model to use (default: large-v3)')
+    args = parser.parse_args()
+
     os.chdir(Path(__file__).resolve().parent)
 
     while True:
@@ -56,12 +62,13 @@ def main():
             break
 
         print(f"Processing file: {media_file.name}")
+        print(f"Using model: {args.model}")
         base_name = media_file.with_suffix('')
         expected_txt = media_file.with_suffix('.txt')
 
         processed_input = preprocess_audio(media_file)
 
-        success = transcribe_with_whisper(processed_input, base_name)
+        success = transcribe_with_whisper(processed_input, base_name, args.model)
         if not success or not expected_txt.exists():
             print(f"Error processing file: {media_file.name}", file=sys.stderr)
             if not expected_txt.exists():
