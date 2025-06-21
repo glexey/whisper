@@ -46,7 +46,8 @@ while true; do
     fi
 
     #whisper --language=ru --output_format=txt --model=large --fp16=False "$media_file"
-    $whisper/build/bin/whisper-cli -m $whisper/models/ggml-large-v3.bin -f "$whisper_input" -l auto -otxt -of "$base_name"
+    $whisper/build/bin/whisper-cli -m $whisper/models/ggml-large-v3.bin -f "$whisper_input" \
+      -l auto -otxt -of "$base_name" -et 2.8 --prompt "Please transcribe with proper punctuation and capitalization."
     
     if [ $? -ne 0 ] || [ ! -f "$expected_txt" ]; then
         echo "Error processing file: $media_file"
