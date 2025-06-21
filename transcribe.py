@@ -20,7 +20,7 @@ def preprocess_audio(src: Path) -> Path:
     processed_wav = src.with_suffix('.processed.wav')
     print(f"Preprocessing {src.name} with ffmpeg...")
     cmd = [
-        'ffmpeg', '-i', src,
+        'ffmpeg', '-i', src, "-y",
         '-ar', '16000', '-ac', '1',
         '-c:a', 'pcm_s16le',
         '-af', 'silenceremove=stop_periods=-1:stop_duration=1:stop_threshold=-30dB',
@@ -40,7 +40,7 @@ def transcribe_with_whisper(input_file: Path, output_base: Path, model: str):
         '-m', whisper_model,
         '-f', input_file,
         '-l', 'auto',
-        '-otxt',
+        '-otxt', "-np", "-pc",
         '-of', output_base,
         '-et', '2.8',
         '--prompt', "Please transcribe with proper punctuation and capitalization."
