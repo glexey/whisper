@@ -1,5 +1,6 @@
 *.txt
 *.mp3
+*.m4a
 *.mov
 *.wav
 .DS_Store
