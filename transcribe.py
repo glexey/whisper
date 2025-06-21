@@ -57,7 +57,7 @@ def main():
 
         print(f"Processing file: {media_file.name}")
         base_name = media_file.with_suffix('')
-        expected_txt = base_name.with_suffix('.txt')
+        expected_txt = media_file.with_suffix('.txt')
 
         processed_input = preprocess_audio(media_file)
 
