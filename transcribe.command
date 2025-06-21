@@ -30,7 +30,7 @@ while true; do
     if [ "$file_extension" != "wav" ]; then
         echo "Converting $media_file to WAV format..."
         wav_file="${base_name}.wav"
-        ffmpeg -i "$media_file" -ar 16000 -ac 1 -c:a pcm_s16le "$wav_file"
+        ffmpeg -i "$media_file" -ar 16000 -ac 1 -c:a pcm_s16le -af silenceremove=stop_periods=-1:stop_duration=1:stop_threshold=-30dB "$wav_file"
         
         if [ $? -ne 0 ]; then
             echo "Error converting file to WAV: $media_file"
